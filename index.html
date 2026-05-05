@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graham vs Buffett — Analizador de Inversiones</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0d1b2a;
+  --navy2: #1a2d42;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --cream: #f5f0e8;
+  --cream2: #ede7d9;
+  --text: #1a1a1a;
+  --muted: #6b6560;
+  --g-blue: #1a4a7a;
+  --g-blue-light: #e8f0f8;
+  --b-green: #2d5a1b;
+  --b-green-light: #e8f2e0;
+  --red: #8b2020;
+  --red-light: #f8e8e8;
+  --amber: #7a4a00;
+  --amber-light: #fdf0d8;
+  --r: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--cream);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND PATTERN ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.page { position: relative; z-index: 1; }
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+/* ── HEADER ── */
+header {
+  padding: 48px 24px 40px;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  max-width: 780px;
+  margin: 0 auto;
+}
+.logo-line {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; margin-bottom: 20px;
+}
+.logo-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold);
+}
+.logo-divider {
+  width: 60px; height: 1px; background: rgba(201,168,76,0.4);
+}
+header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  color: var(--cream);
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+header h1 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+header p {
+  font-size: 15px;
+  color: rgba(245,240,232,0.6);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── SECTION SYSTEM ── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── STEP INDICATOR ── */
+.steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; padding: 28px 24px;
+  max-width: 780px; margin: 0 auto;
+}
+.step-item {
+  display: flex; align-items: center; gap: 0;
+  flex: 1;
+}
+.step-circle {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: rgba(245,240,232,0.4);
+  flex-shrink: 0; transition: all 0.3s;
+}
+.step-circle.done { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+.step-circle.active { border-color: var(--gold); color: var(--gold); }
+.step-line { flex: 1; height: 1px; background: rgba(201,168,76,0.2); }
+.step-line.done { background: var(--gold); }
+.step-label {
+  font-size: 11px; color: rgba(245,240,232,0.4);
+  text-align: center; margin-top: 6px;
+  white-space: nowrap;
+}
+.step-wrap { display: flex; flex-direction: column; align-items: center; }
+
+/* ── QUIZ ── */
+.quiz-wrap {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 20px;
+  padding: 40px;
+  margin: 0 auto 32px;
+}
+.quiz-progress {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 32px;
+}
+.prog-track {
+  flex: 1; height: 3px;
+  background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
+}
+.prog-fill {
+  height: 100%; background: var(--gold);
+  border-radius: 2px; transition: width 0.4s ease;
+}
+.prog-label {
+  font-size: 12px; color: rgba(245,240,232,0.5);
+  white-space: nowrap; flex-shrink: 0;
+}
+.q-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(18px, 3vw, 24px);
+  color: var(--cream);
+  line-height: 1.4;
+  margin-bottom: 28px;
+}
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.opt {
+  padding: 14px 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r);
+  background: rgba(255,255,255,0.03);
+  color: rgba(245,240,232,0.8);
+  font-size: 14px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; text-align: left; line-height: 1.5;
+  transition: all 0.2s;
+}
+.opt:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.06); color: var(--cream); }
+.opt.selected { border-color: var(--gold); background: rgba(201,168,76,0.12); color: var(--cream); }
+.quiz-nav { display: flex; justify-content: space-between; align-items: center; }
+.btn-ghost {
+  background: none; border: none;
+  font-size: 13px; color: rgba(245,240,232,0.4);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: color 0.2s;
+}
+.btn-ghost:hover { color: var(--cream); }
+.btn-primary {
+  height: 42px; padding: 0 24px;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--r);
+  font-size: 14px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--gold-light); }
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── PROFILE RESULT ── */
+.profile-hero {
+  text-align: center; padding: 40px 24px 32px;
+}
+.profile-badge {
+  display: inline-block;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+  padding: 5px 14px; border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+.profile-hero h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1.1; margin-bottom: 8px;
+}
+.profile-hero .sub {
+  font-size: 16px; color: rgba(245,240,232,0.6);
+  margin-bottom: 20px;
+}
+.profile-hero .desc {
+  font-size: 15px; color: rgba(245,240,232,0.75);
+  line-height: 1.7; max-width: 540px; margin: 0 auto 32px;
+}
+
+/* Dimension bars */
+.dims-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 28px;
+}
+.dim-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--r); padding: 14px 16px;
+}
+.dim-label { font-size: 11px; color: rgba(245,240,232,0.5); margin-bottom: 8px; letter-spacing: 0.04em; }
+.dim-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
+.dim-bar { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+.dim-pct { font-size: 13px; font-weight: 500; }
+
+/* Tags */
+.tags-section { margin-bottom: 24px; }
+.tags-title { font-size: 12px; color: rgba(245,240,232,0.4); letter-spacing: 0.06em; margin-bottom: 10px; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag {
+  font-size: 12px; padding: 5px 12px;
+  border-radius: 20px; border: 1px solid transparent;
+}
+.tag-green { background: rgba(45,90,27,0.3); border-color: rgba(45,90,27,0.5); color: #a8d88a; }
+.tag-red { background: rgba(139,32,32,0.3); border-color: rgba(139,32,32,0.5); color: #f0a0a0; }
+.tag-gold { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.3); color: var(--gold-light); }
+
+/* Weight visualization */
+.weights-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: var(--r); padding: 20px;
+  margin-bottom: 24px;
+}
+.weights-title { font-size: 13px; color: rgba(245,240,232,0.5); margin-bottom: 14px; }
+.weight-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.weight-name { font-size: 13px; color: rgba(245,240,232,0.7); width: 130px; flex-shrink: 0; }
+.weight-track { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.weight-bar { height: 100%; border-radius: 3px; }
+.weight-pct { font-size: 12px; font-weight: 500; width: 32px; text-align: right; }
+
+.cta-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.btn-secondary {
+  height: 42px; padding: 0 20px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--r); color: rgba(245,240,232,0.8);
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+/* ── ANALYZER ── */
+.analyzer-header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid rgba(201,168,76,0.12);
+  margin-bottom: 28px;
+}
+.analyzer-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; margin-bottom: 6px;
+}
+.analyzer-header p { font-size: 14px; color: rgba(245,240,232,0.5); }
+
+.profile-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 4px 12px;
+  border-radius: 20px; border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold-light); margin-bottom: 16px;
+}
+.profile-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+.search-box {
+  display: flex; gap: 10px; margin-bottom: 16px;
+}
+.search-box input {
+  flex: 1; height: 48px; padding: 0 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--r); color: var(--cream);
+  font-size: 16px; font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s;
+}
+.search-box input::placeholder { color: rgba(245,240,232,0.3); }
+.search-box input:focus { outline: none; border-color: rgba(201,168,76,0.5); }
+.search-box button {
+  height: 48px; padding: 0 24px;
+  background: var(--gold); color: var(--navy);
+  border: none; border-radius: var(--r);
+  font-size: 14px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.search-box button:hover { background: var(--gold-light); }
+.search-box button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.asset-types {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;
+}
+.atype {
+  font-size: 11px; padding: 4px 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; color: rgba(245,240,232,0.5);
+  cursor: pointer; transition: all 0.2s; background: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.atype:hover, .atype.active { border-color: rgba(201,168,76,0.4); color: var(--gold-light); background: rgba(201,168,76,0.08); }
+
+.examples-grid {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px;
+}
+.ex-chip {
+  font-size: 12px; padding: 5px 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; color: rgba(245,240,232,0.5);
+  cursor: pointer; background: rgba(255,255,255,0.03);
+  transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+}
+.ex-chip:hover { border-color: rgba(201,168,76,0.3); color: var(--cream); background: rgba(201,168,76,0.06); }
+
+/* Loading */
+.loading {
+  text-align: center; padding: 60px 20px;
+  display: none;
+}
+.loading-spinner {
+  width: 40px; height: 40px;
+  border: 2px solid rgba(201,168,76,0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { font-size: 14px; color: rgba(245,240,232,0.5); }
+
+/* Error */
+.error-box {
+  background: rgba(139,32,32,0.2);
+  border: 1px solid rgba(139,32,32,0.4);
+  border-radius: var(--r); padding: 14px 18px;
+  font-size: 14px; color: #f0a0a0;
+  margin-bottom: 20px; display: none;
+}
+
+/* Results */
+.results { display: none; }
+.company-bar {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 16px; padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.company-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(201,168,76,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: var(--gold); flex-shrink: 0;
+}
+.company-name { font-size: 18px; font-weight: 500; color: var(--cream); }
+.company-meta { font-size: 13px; color: rgba(245,240,232,0.5); margin-top: 2px; }
+
+/* Metrics strip */
+.metrics-strip {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px; margin-bottom: 20px;
+}
+.metric-tile {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--r); padding: 12px 14px; text-align: center;
+}
+.metric-val { font-size: 16px; font-weight: 500; color: var(--cream); }
+.metric-key { font-size: 10px; color: rgba(245,240,232,0.4); margin-top: 4px; letter-spacing: 0.03em; }
+
+/* Versus grid */
+.versus { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.analyst-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px; padding: 24px;
+  border-top-width: 3px;
+}
+.analyst-card.graham { border-top-color: #4a90c4; }
+.analyst-card.buffett { border-top-color: #6aaa3a; }
+.analyst-label {
+  font-size: 10px; letter-spacing: 0.1em; font-weight: 500;
+  color: rgba(245,240,232,0.4); margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.score-display { display: flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
+.score-num { font-family: 'DM Serif Display', serif; font-size: 48px; line-height: 1; }
+.score-num.g { color: #4a90c4; }
+.score-num.b { color: #6aaa3a; }
+.score-denom { font-size: 14px; color: rgba(245,240,232,0.4); }
+.score-track { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 14px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.score-fill.g { background: #4a90c4; }
+.score-fill.b { background: #6aaa3a; }
+.verdict-pill {
+  display: inline-block; font-size: 11px; font-weight: 500;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 16px;
+  letter-spacing: 0.04em;
+}
+.vp-comprar { background: rgba(45,90,27,0.4); color: #a8d88a; border: 1px solid rgba(45,90,27,0.5); }
+.vp-esperar { background: rgba(122,74,0,0.4); color: #f0c878; border: 1px solid rgba(122,74,0,0.5); }
+.vp-evitar { background: rgba(139,32,32,0.4); color: #f0a0a0; border: 1px solid rgba(139,32,32,0.5); }
+
+.list-label { font-size: 10px; letter-spacing: 0.06em; color: rgba(245,240,232,0.4); margin-bottom: 6px; text-transform: uppercase; }
+.list-items { list-style: none; margin-bottom: 14px; }
+.list-items li { font-size: 13px; color: rgba(245,240,232,0.8); padding: 3px 0 3px 16px; position: relative; line-height: 1.4; }
+.list-items li.pos::before { content: "↑"; position: absolute; left: 0; color: #6aaa3a; font-size: 10px; top: 5px; }
+.list-items li.neg::before { content: "↓"; position: absolute; left: 0; color: #f07070; font-size: 10px; top: 5px; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.flag {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+}
+.flag-yes { background: rgba(45,90,27,0.3); color: #a8d88a; border: 1px solid rgba(45,90,27,0.4); }
+.flag-no { background: rgba(139,32,32,0.3); color: #f0a0a0; border: 1px solid rgba(139,32,32,0.4); }
+
+/* Profile score card */
+.profile-score-card {
+  background: rgba(201,168,76,0.07);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 16px; padding: 24px;
+  margin-bottom: 16px;
+}
+.ps-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.ps-title { font-size: 13px; color: var(--gold-light); font-weight: 500; }
+.ps-score { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--gold); }
+.ps-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ps-label { font-size: 13px; color: rgba(245,240,232,0.6); min-width: 160px; }
+.ps-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+.ps-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 1s ease; }
+.ps-pct { font-size: 12px; color: var(--gold-light); width: 32px; text-align: right; }
+
+/* Final card */
+.final-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 16px; padding: 24px;
+  margin-bottom: 24px;
+}
+.final-title { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 16px; }
+.final-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+.final-key { font-size: 13px; color: rgba(245,240,232,0.5); min-width: 160px; flex-shrink: 0; }
+.final-val { font-size: 13px; color: var(--cream); font-weight: 500; }
+.verdict-tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+.vtag {
+  font-size: 12px; padding: 5px 14px; border-radius: 20px;
+}
+.vtag-q { background: rgba(45,90,27,0.3); color: #a8d88a; border: 1px solid rgba(45,90,27,0.4); }
+.vtag-p { background: rgba(122,74,0,0.3); color: #f0c878; border: 1px solid rgba(122,74,0,0.4); }
+.vtag-n { background: rgba(255,255,255,0.06); color: rgba(245,240,232,0.6); border: 1px solid rgba(255,255,255,0.1); }
+.final-rec {
+  font-size: 15px; line-height: 1.7;
+  color: rgba(245,240,232,0.85);
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 12px;
+}
+
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center; padding: 40px 24px;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  margin-top: 60px;
+}
+footer p { font-size: 12px; color: rgba(245,240,232,0.25); line-height: 1.6; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.4s ease forwards; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 580px) {
+  .versus { grid-template-columns: 1fr; }
+  .metrics-strip { grid-template-columns: repeat(3, 1fr); }
+  .dims-grid { grid-template-columns: 1fr; }
+  .quiz-wrap { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-line">
+      <div class="logo-dot"></div>
+      <div class="logo-divider"></div>
+      <div class="logo-dot"></div>
+    </div>
+    <h1>Graham <em>vs</em> Buffett<br>Analizador de Inversiones</h1>
+    <p>Evalúa cualquier activo del mercado global desde dos filosofías legendarias, adaptado a tu perfil como inversionista</p>
+  </header>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="stepBar">
+    <div class="step-wrap">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label">Tu perfil</div>
+    </div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-wrap">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label">Resultado</div>
+    </div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-wrap">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label">Analizar activo</div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1: QUIZ ══ -->
+  <div class="section active container" id="secQuiz">
+    <div class="quiz-wrap">
+      <div class="quiz-progress">
+        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <div class="prog-label" id="progLabel">1 / 8</div>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="optBox"></div>
+      <div class="quiz-nav">
+        <button class="btn-ghost" id="btnBack" onclick="quizBack()">← Atrás</button>
+        <button class="btn-primary" id="btnNext" onclick="quizNext()" disabled>Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 2: PROFILE ══ -->
+  <div class="section container" id="secProfile">
+    <div class="profile-hero">
+      <div class="profile-badge" id="pBadge">—</div>
+      <h2 id="pName">—</h2>
+      <div class="sub" id="pSub">—</div>
+      <div class="desc" id="pDesc">—</div>
+    </div>
+
+    <div class="dims-grid" id="pDims"></div>
+
+    <div class="weights-card">
+      <div class="weights-title">Cómo se ponderará tu análisis</div>
+      <div id="weightsViz"></div>
+    </div>
+
+    <div class="tags-section">
+      <div class="tags-title">ACTIVOS RECOMENDADOS PARA TI</div>
+      <div class="tags" id="pAssets"></div>
+    </div>
+    <div class="tags-section" style="margin-bottom:28px">
+      <div class="tags-title">ACTIVOS QUE DEBERÍAS EVITAR</div>
+      <div class="tags" id="pAvoid"></div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn-primary" onclick="goAnalyzer()">Ir al analizador de activos →</button>
+      <button class="btn-secondary" onclick="restartQuiz()">Repetir quiz</button>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 3: ANALYZER ══ -->
+  <div class="section container" id="secAnalyzer">
+    <div class="analyzer-header">
+      <div class="profile-pill" id="analyzerPill"><div class="dot"></div><span id="pillLabel">—</span></div>
+      <h2 class="analyzer-header">Analiza cualquier activo</h2>
+      <p>Acciones · Criptomonedas · ETFs · Commodities · Índices globales</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="tickerInput" placeholder="Ticker o nombre (ej: AAPL, BTC, GLD, SPY...)" />
+      <button id="btnAnalyze" onclick="analyze()">Analizar</button>
+    </div>
+
+    <div class="asset-types">
+      <button class="atype active" onclick="setType(this,'all')">Todos</button>
+      <button class="atype" onclick="setType(this,'stocks')">Acciones</button>
+      <button class="atype" onclick="setType(this,'crypto')">Cripto</button>
+      <button class="atype" onclick="setType(this,'etf')">ETFs</button>
+      <button class="atype" onclick="setType(this,'commodity')">Commodities</button>
+    </div>
+
+    <div class="examples-grid" id="examplesGrid"></div>
+
+    <div class="loading" id="loadingBox">
+      <div class="loading-spinner"></div>
+      <p id="loadingText">Analizando...</p>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="results" id="resultsBox">
+      <div class="company-bar">
+        <div class="company-icon" id="rIcon">—</div>
+        <div>
+          <div class="company-name" id="rName">—</div>
+          <div class="company-meta" id="rMeta">—</div>
+        </div>
+      </div>
+
+      <div class="metrics-strip" id="metricsStrip"></div>
+
+      <div class="versus">
+        <!-- Graham -->
+        <div class="analyst-card graham fade-up">
+          <div class="analyst-label">Benjamin Graham</div>
+          <div class="score-display">
+            <span class="score-num g" id="gScore">—</span>
+            <span class="score-denom">/ 100</span>
+          </div>
+          <div class="score-track"><div class="score-fill g" id="gBar" style="width:0%"></div></div>
+          <div id="gVerdict" class="verdict-pill">—</div>
+          <div class="list-label">Fortalezas</div>
+          <ul class="list-items" id="gStr"></ul>
+          <div class="list-label">Debilidades</div>
+          <ul class="list-items" id="gWeak"></ul>
+          <div class="flags" id="gFlags"></div>
+        </div>
+        <!-- Buffett -->
+        <div class="analyst-card buffett fade-up">
+          <div class="analyst-label">Warren Buffett</div>
+          <div class="score-display">
+            <span class="score-num b" id="bScore">—</span>
+            <span class="score-denom">/ 100</span>
+          </div>
+          <div class="score-track"><div class="score-fill b" id="bBar" style="width:0%"></div></div>
+          <div id="bVerdict" class="verdict-pill">—</div>
+          <div class="list-label">Fortalezas</div>
+          <ul class="list-items" id="bStr"></ul>
+          <div class="list-label">Debilidades</div>
+          <ul class="list-items" id="bWeak"></ul>
+          <div class="flags" id="bFlags"></div>
+        </div>
+      </div>
+
+      <!-- Profile Score -->
+      <div class="profile-score-card fade-up" id="profileScoreCard">
+        <div class="ps-header">
+          <div class="ps-title" id="psTitle">Compatibilidad con tu perfil</div>
+          <div class="ps-score" id="psScore">—</div>
+        </div>
+        <div id="psRows"></div>
+      </div>
+
+      <!-- Final -->
+      <div class="final-card fade-up">
+        <div class="final-title">Veredicto final</div>
+        <div class="final-row">
+          <span class="final-key">Le gustaría más a:</span>
+          <span class="final-val" id="fWinner">—</span>
+        </div>
+        <div class="final-row">
+          <span class="final-key">Compatible con tu perfil:</span>
+          <span class="final-val" id="fCompat">—</span>
+        </div>
+        <div class="verdict-tags" id="fTags"></div>
+        <div class="final-rec" id="fRec">—</div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-primary" onclick="clearResults()">Analizar otro activo</button>
+        <button class="btn-secondary" onclick="goBack()">← Cambiar perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Graham vs Buffett Analyzer · Herramienta educativa de análisis de inversiones<br>No constituye asesoramiento financiero. Siempre consulta fuentes oficiales antes de invertir.</p>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// QUIZ DATA
+// ══════════════════════════════════════════════
+const questions = [
+  { text: "¿Cuánto tiempo planeas mantener tus inversiones antes de necesitar el dinero?", opts: [
+    { t: "Menos de 1 año — necesito liquidez rápida", s: {c:4,m:1,a:0,sp:0} },
+    { t: "1 a 3 años — horizonte corto-mediano", s: {c:3,m:2,a:1,sp:0} },
+    { t: "3 a 7 años — puedo esperar con paciencia", s: {c:1,m:3,a:2,sp:1} },
+    { t: "Más de 10 años — invierto para el futuro lejano", s: {c:0,m:1,a:3,sp:3} }
+  ]},
+  { text: "Si tu portafolio cae un 30% en un mes, ¿qué harías?", opts: [
+    { t: "Vendo todo de inmediato para no perder más", s: {c:4,m:1,a:0,sp:0} },
+    { t: "Me preocupo mucho pero espero a que se recupere", s: {c:2,m:3,a:1,sp:0} },
+    { t: "Lo veo como una oportunidad y mantengo mis posiciones", s: {c:0,m:2,a:3,sp:1} },
+    { t: "Compro más — las caídas son el momento de entrar fuerte", s: {c:0,m:0,a:2,sp:4} }
+  ]},
+  { text: "¿Cuál es tu objetivo principal al invertir?", opts: [
+    { t: "Proteger mi capital y que no pierda valor", s: {c:4,m:1,a:0,sp:0} },
+    { t: "Crecer gradualmente con riesgo controlado", s: {c:2,m:3,a:1,sp:0} },
+    { t: "Maximizar ganancias a largo plazo, acepto volatilidad", s: {c:0,m:2,a:4,sp:1} },
+    { t: "Busco ganancias rápidas y altas — acepto riesgos extremos", s: {c:0,m:0,a:1,sp:4} }
+  ]},
+  { text: "¿Qué porcentaje de tus ahorros totales estás dispuesto a arriesgar?", opts: [
+    { t: "Menos del 10% — el resto en lugares seguros", s: {c:4,m:1,a:0,sp:0} },
+    { t: "Entre 10% y 30% — diversificado y cauteloso", s: {c:2,m:3,a:1,sp:0} },
+    { t: "Entre 30% y 60% — creo en las oportunidades del mercado", s: {c:0,m:2,a:3,sp:1} },
+    { t: "Más del 60% — o todo lo que pueda poner a trabajar", s: {c:0,m:0,a:1,sp:4} }
+  ]},
+  { text: "¿Cuánta experiencia tienes en mercados financieros?", opts: [
+    { t: "Ninguna — soy completamente nuevo en esto", s: {c:3,m:2,a:0,sp:0} },
+    { t: "Básica — conozco acciones y algo de fondos de inversión", s: {c:1,m:3,a:2,sp:0} },
+    { t: "Intermedia — manejo portafolios, ETFs y análisis fundamental", s: {c:0,m:2,a:3,sp:1} },
+    { t: "Avanzada — cripto, opciones, futuros, análisis técnico activo", s: {c:0,m:0,a:2,sp:4} }
+  ]},
+  { text: "¿Qué tipo de activos te generan más interés?", opts: [
+    { t: "Bonos, CDTs, fondos de renta fija y depósitos", s: {c:4,m:1,a:0,sp:0} },
+    { t: "Acciones de empresas sólidas y ETFs del S&P 500", s: {c:1,m:3,a:2,sp:0} },
+    { t: "Acciones de crecimiento, REITs, commodities y mercados emergentes", s: {c:0,m:1,a:4,sp:1} },
+    { t: "Criptomonedas, altcoins, memecoins y proyectos de alto riesgo", s: {c:0,m:0,a:1,sp:4} }
+  ]},
+  { text: "Si tuvieras $10,000 para invertir hoy, ¿cómo los distribuirías?", opts: [
+    { t: "Todo en activos seguros — bonos del gobierno o ahorro", s: {c:4,m:0,a:0,sp:0} },
+    { t: "70% estable + 30% en acciones de empresas reconocidas", s: {c:1,m:3,a:1,sp:0} },
+    { t: "50% acciones globales + 30% growth + 20% Bitcoin", s: {c:0,m:1,a:3,sp:2} },
+    { t: "100% en lo que crea que tiene mayor potencial de multiplicarse", s: {c:0,m:0,a:1,sp:4} }
+  ]},
+  { text: "¿Cómo describes tu relación emocional con las pérdidas?", opts: [
+    { t: "Una pérdida pequeña me genera mucho estrés y ansiedad", s: {c:4,m:1,a:0,sp:0} },
+    { t: "Las acepto si son temporales y el plan a largo plazo es sólido", s: {c:1,m:4,a:1,sp:0} },
+    { t: "Son parte del juego — confío en mi estrategia y el largo plazo", s: {c:0,m:1,a:4,sp:1} },
+    { t: "Me motivan a buscar la próxima gran apuesta con más fuerza", s: {c:0,m:0,a:1,sp:4} }
+  ]}
+];
+
+// ══════════════════════════════════════════════
+// PROFILES
+// ══════════════════════════════════════════════
+const profiles = {
+  conservador: {
+    name: "Conservador", sub: "Protector de capital",
+    badgeBg: "rgba(74,144,196,0.2)", badgeBorder: "rgba(74,144,196,0.4)", badgeColor: "#a0c8f0",
+    color: "#4a90c4",
+    desc: "Tu prioridad absoluta es preservar lo que tienes. Prefieres rendimientos modestos pero predecibles, y las caídas del mercado te generan ansiedad real. Eres ideal para renta fija, bonos, y empresas ultra-estables con historial largo de dividendos.",
+    dims: [
+      { label: "Tolerancia al riesgo", val: 15, color: "#4a90c4" },
+      { label: "Horizonte temporal", val: 25, color: "#4a90c4" },
+      { label: "Agresividad", val: 10, color: "#4a90c4" },
+      { label: "Diversificación", val: 85, color: "#4a90c4" }
+    ],
+    refs: ["Benjamin Graham", "John Bogle"],
+    assets: ["Bonos del tesoro", "CDTs", "ETFs de dividendos", "Acciones value baratas"],
+    avoid: ["Criptomonedas", "Memecoins", "Startups", "Opciones y futuros"],
+    gw: 0.55, bw: 0.30, pw: 0.15
+  },
+  moderado: {
+    name: "Moderado", sub: "Crecimiento equilibrado",
+    badgeBg: "rgba(106,170,58,0.2)", badgeBorder: "rgba(106,170,58,0.4)", badgeColor: "#a8d88a",
+    color: "#6aaa3a",
+    desc: "Buscas hacer crecer tu patrimonio sin asumir riesgos innecesarios. Puedes tolerar caídas temporales si el plan es sólido a largo plazo. Eres el tipo de inversionista más exitoso estadísticamente en el tiempo.",
+    dims: [
+      { label: "Tolerancia al riesgo", val: 50, color: "#6aaa3a" },
+      { label: "Horizonte temporal", val: 65, color: "#6aaa3a" },
+      { label: "Agresividad", val: 40, color: "#6aaa3a" },
+      { label: "Diversificación", val: 75, color: "#6aaa3a" }
+    ],
+    refs: ["Warren Buffett", "Peter Lynch"],
+    assets: ["Acciones blue-chip", "ETFs globales", "REITs", "Bitcoin (posición pequeña)"],
+    avoid: ["Altcoins especulativos", "Memecoins", "Apalancamiento alto"],
+    gw: 0.30, bw: 0.50, pw: 0.20
+  },
+  agresivo: {
+    name: "Agresivo", sub: "Maximizador de retorno",
+    badgeBg: "rgba(201,168,76,0.2)", badgeBorder: "rgba(201,168,76,0.4)", badgeColor: "#e8c97a",
+    color: "#c9a84c",
+    desc: "Buscas maximizar retornos y entiendes que eso implica alta volatilidad. Tienes un horizonte largo y no te asusta ver caídas fuertes en tu portafolio. Puedes invertir en activos de alto riesgo/retorno con convicción y disciplina.",
+    dims: [
+      { label: "Tolerancia al riesgo", val: 80, color: "#c9a84c" },
+      { label: "Horizonte temporal", val: 85, color: "#c9a84c" },
+      { label: "Agresividad", val: 75, color: "#c9a84c" },
+      { label: "Diversificación", val: 50, color: "#c9a84c" }
+    ],
+    refs: ["Warren Buffett (early)", "George Soros", "Peter Lynch"],
+    assets: ["Acciones growth", "Bitcoin y Ethereum", "Commodities", "Mercados emergentes"],
+    avoid: ["Memecoins sin fundamentos", "Apalancamiento extremo sin stop-loss"],
+    gw: 0.20, bw: 0.40, pw: 0.40
+  },
+  especulador: {
+    name: "Especulador", sub: "Cazador de oportunidades",
+    badgeBg: "rgba(200,60,60,0.2)", badgeBorder: "rgba(200,60,60,0.4)", badgeColor: "#f0a0a0",
+    color: "#c84040",
+    desc: "Buscas multiplicar capital rápidamente y aceptas pérdidas totales en algunas posiciones. Operas con convicción en activos de altísimo riesgo. Exclusivo para personas con experiencia avanzada que pueden permitirse perder todo lo invertido en una posición.",
+    dims: [
+      { label: "Tolerancia al riesgo", val: 95, color: "#c84040" },
+      { label: "Horizonte temporal", val: 30, color: "#c84040" },
+      { label: "Agresividad", val: 95, color: "#c84040" },
+      { label: "Diversificación", val: 20, color: "#c84040" }
+    ],
+    refs: ["George Soros", "Jesse Livermore", "Michael Burry"],
+    assets: ["Altcoins y cripto", "Opciones y futuros", "Penny stocks", "Derivados"],
+    avoid: ["Invertir dinero que no puedas perder", "Operar sin stop-loss"],
+    gw: 0.10, bw: 0.20, pw: 0.70
+  }
+};
+
+// ══════════════════════════════════════════════
+// EXAMPLES BY TYPE
+// ══════════════════════════════════════════════
+const examples = {
+  all: ["AAPL","MSFT","KO","BTC","ETH","SPY","GLD","AMZN","NVDA","JNJ"],
+  stocks: ["AAPL","MSFT","KO","JNJ","AMZN","NVDA","BRK.B","F","TSLA","META"],
+  crypto: ["BTC","ETH","SOL","BNB","ADA","DOGE","XRP","AVAX","DOT","MATIC"],
+  etf: ["SPY","QQQ","VTI","GLD","IWM","EEM","VNQ","TLT","ARKK","DIA"],
+  commodity: ["GLD","SLV","OIL","WEAT","CORN","CPER","PDBC","GDX","USO","DJP"]
+};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let answers = [];
+let current = 0;
+let userProfile = null;
+let currentType = 'all';
+
+// ══════════════════════════════════════════════
+// QUIZ LOGIC
+// ══════════════════════════════════════════════
+function renderQuiz() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = (current + 1) + ' / ' + questions.length;
+  document.getElementById('qText').textContent = q.text;
+  const box = document.getElementById('optBox');
+  box.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[current] === i ? ' selected' : '');
+    btn.textContent = o.t;
+    btn.onclick = () => selectOpt(i);
+    box.appendChild(btn);
+  });
+  document.getElementById('btnBack').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const isLast = current === questions.length - 1;
+  document.getElementById('btnNext').textContent = isLast ? 'Ver mi perfil →' : 'Siguiente →';
+  document.getElementById('btnNext').disabled = answers[current] === undefined;
+}
+
+function selectOpt(i) {
+  answers[current] = i;
+  document.querySelectorAll('.opt').forEach((b, idx) => {
+    b.className = 'opt' + (idx === i ? ' selected' : '');
+  });
+  document.getElementById('btnNext').disabled = false;
+}
+
+function quizNext() {
+  if (answers[current] === undefined) return;
+  if (current < questions.length - 1) { current++; renderQuiz(); }
+  else showProfile();
+}
+
+function quizBack() {
+  if (current > 0) { current--; renderQuiz(); }
+}
+
+function calcProfile() {
+  const s = { c:0, m:0, a:0, sp:0 };
+  answers.forEach((ai, qi) => {
+    const sc = questions[qi].opts[ai].s;
+    s.c += sc.c; s.m += sc.m; s.a += sc.a; s.sp += sc.sp;
+  });
+  let type = 'conservador', max = s.c;
+  if (s.m > max) { max = s.m; type = 'moderado'; }
+  if (s.a > max) { max = s.a; type = 'agresivo'; }
+  if (s.sp > max) { type = 'especulador'; }
+  return type;
+}
+
+// ══════════════════════════════════════════════
+// PROFILE DISPLAY
+// ══════════════════════════════════════════════
+function showProfile() {
+  userProfile = calcProfile();
+  const p = profiles[userProfile];
+
+  setStep(2);
+  showSection('secProfile');
+
+  // Badge
+  const badge = document.getElementById('pBadge');
+  badge.textContent = p.name.toUpperCase();
+  badge.style.background = p.badgeBg;
+  badge.style.border = '1px solid ' + p.badgeBorder;
+  badge.style.color = p.badgeColor;
+  badge.style.padding = '5px 16px';
+  badge.style.borderRadius = '20px';
+  badge.style.fontSize = '11px';
+  badge.style.letterSpacing = '0.1em';
+  badge.style.fontWeight = '500';
+
+  document.getElementById('pName').textContent = p.name;
+  document.getElementById('pName').style.color = p.badgeColor;
+  document.getElementById('pSub').textContent = p.sub;
+  document.getElementById('pDesc').textContent = p.desc;
+
+  // Dims
+  const dimsEl = document.getElementById('pDims');
+  dimsEl.innerHTML = p.dims.map(d => `
+    <div class="dim-card">
+      <div class="dim-label">${d.label}</div>
+      <div class="dim-track"><div class="dim-bar" style="width:${d.val}%;background:${d.color}"></div></div>
+      <div class="dim-pct" style="color:${d.color}">${d.val}%</div>
+    </div>
+  `).join('');
+
+  // Weights
+  const weights = [
+    { label: 'Criterios Graham', pct: Math.round(p.gw*100), color: '#4a90c4' },
+    { label: 'Criterios Buffett', pct: Math.round(p.bw*100), color: '#6aaa3a' },
+    { label: 'Perfil personal', pct: Math.round(p.pw*100), color: p.color }
+  ];
+  document.getElementById('weightsViz').innerHTML = weights.map(w => `
+    <div class="weight-row">
+      <div class="weight-name">${w.label}</div>
+      <div class="weight-track"><div class="weight-bar" style="width:${w.pct}%;background:${w.color}"></div></div>
+      <div class="weight-pct" style="color:${w.color}">${w.pct}%</div>
+    </div>
+  `).join('');
+
+  // Assets/avoid
+  document.getElementById('pAssets').innerHTML = p.assets.map(a => `<span class="tag tag-green">${a}</span>`).join('');
+  document.getElementById('pAvoid').innerHTML = p.avoid.map(a => `<span class="tag tag-red">${a}</span>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// ANALYZER
+// ══════════════════════════════════════════════
+function goAnalyzer() {
+  const p = profiles[userProfile];
+  setStep(3);
+  showSection('secAnalyzer');
+  document.getElementById('pillLabel').textContent = 'Perfil: ' + p.name;
+  renderExamples();
+}
+
+function setType(btn, type) {
+  document.querySelectorAll('.atype').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentType = type;
+  renderExamples();
+}
+
+function renderExamples() {
+  const list = examples[currentType] || examples.all;
+  document.getElementById('examplesGrid').innerHTML = list.map(e =>
+    `<button class="ex-chip" onclick="setTicker('${e}')">${e}</button>`
+  ).join('');
+}
+
+function setTicker(t) { document.getElementById('tickerInput').value = t; }
+
+async function analyze() {
+  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+  if (!ticker) return;
+  const p = profiles[userProfile];
+  const btn = document.getElementById('btnAnalyze');
+  btn.disabled = true; btn.textContent = 'Analizando...';
+
+  document.getElementById('loadingBox').style.display = 'block';
+  document.getElementById('resultsBox').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+
+  const loadingTexts = [
+    'Obteniendo datos financieros de ' + ticker + '...',
+    'Aplicando criterios de Graham...',
+    'Aplicando criterios de Buffett...',
+    'Ajustando a tu perfil ' + p.name + '...'
+  ];
+  let li = 0;
+  const loadInt = setInterval(() => {
+    li = (li + 1) % loadingTexts.length;
+    document.getElementById('loadingText').textContent = loadingTexts[li];
+  }, 1400);
+
+  try {
+
+    const resp = await fetch("/.netlify/functions/analyze", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticker,
+        profile: userProfile,
+        profileName: p.name,
+        profileSub: p.sub,
+        gw: p.gw, bw: p.bw, pw: p.pw,
+        profileColor: p.color
+      })
+    });
+
+    clearInterval(loadInt);
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
+    renderResults(result);
+  } catch(e) {
+    clearInterval(loadInt);
+    document.getElementById('errorBox').textContent = 'No se pudo analizar "' + ticker + '". Verifica que el ticker sea correcto e intenta de nuevo. Ejemplos: AAPL, BTC, SPY, GLD.';
+    document.getElementById('errorBox').style.display = 'block';
+  }
+
+  document.getElementById('loadingBox').style.display = 'none';
+  btn.disabled = false; btn.textContent = 'Analizar';
+}
+
+// ══════════════════════════════════════════════
+// RENDER RESULTS
+// ══════════════════════════════════════════════
+function verdictClass(v) {
+  if (v === 'Comprar') return 'vp-comprar';
+  if (v === 'Esperar') return 'vp-esperar';
+  return 'vp-evitar';
+}
+
+function renderResults(r) {
+  const p = profiles[userProfile];
+  const m = r.metrics;
+
+  // Company bar
+  document.getElementById('rIcon').textContent = r.ticker.charAt(0);
+  document.getElementById('rName').textContent = r.company + ' (' + r.ticker + ')';
+  document.getElementById('rMeta').textContent = r.type + ' · ' + r.sector + ' · Cap: ' + (r.marketCap || 'N/D');
+
+  // Metrics strip
+  const metricsList = [
+    { k: 'P/E Ratio', v: m.peRatio != null ? m.peRatio.toFixed(1) + 'x' : 'N/D' },
+    { k: 'P/B Ratio', v: m.pbRatio != null ? m.pbRatio.toFixed(1) + 'x' : 'N/D' },
+    { k: 'ROE', v: m.roe != null ? m.roe.toFixed(1) + '%' : 'N/D' },
+    { k: 'FCF Margin', v: m.fcfMargin != null ? m.fcfMargin.toFixed(1) + '%' : 'N/D' },
+    { k: 'Volatilidad', v: m.volatility || 'N/D' }
+  ];
+  document.getElementById('metricsStrip').innerHTML = metricsList.map(mi =>
+    `<div class="metric-tile"><div class="metric-val">${mi.v}</div><div class="metric-key">${mi.k}</div></div>`
+  ).join('');
+
+  // Graham
+  const gs = Math.round(r.graham.score);
+  document.getElementById('gScore').textContent = gs;
+  setTimeout(() => { document.getElementById('gBar').style.width = gs + '%'; }, 100);
+  const gv = document.getElementById('gVerdict');
+  gv.textContent = r.graham.verdict; gv.className = 'verdict-pill ' + verdictClass(r.graham.verdict);
+  document.getElementById('gStr').innerHTML = r.graham.strengths.map(s => `<li class="pos">${s}</li>`).join('');
+  document.getElementById('gWeak').innerHTML = r.graham.weaknesses.map(s => `<li class="neg">${s}</li>`).join('');
+  document.getElementById('gFlags').innerHTML =
+    `<span class="flag ${r.graham.marginOfSafety ? 'flag-yes' : 'flag-no'}">${r.graham.marginOfSafety ? '✓' : '✗'} Margen de seguridad</span>`;
+
+  // Buffett
+  const bs = Math.round(r.buffett.score);
+  document.getElementById('bScore').textContent = bs;
+  setTimeout(() => { document.getElementById('bBar').style.width = bs + '%'; }, 100);
+  const bv = document.getElementById('bVerdict');
+  bv.textContent = r.buffett.verdict; bv.className = 'verdict-pill ' + verdictClass(r.buffett.verdict);
+  document.getElementById('bStr').innerHTML = r.buffett.strengths.map(s => `<li class="pos">${s}</li>`).join('');
+  document.getElementById('bWeak').innerHTML = r.buffett.weaknesses.map(s => `<li class="neg">${s}</li>`).join('');
+  document.getElementById('bFlags').innerHTML =
+    `<span class="flag ${r.buffett.hasMoat ? 'flag-yes' : 'flag-no'}">${r.buffett.hasMoat ? '✓' : '✗'} Tiene moat</span>` +
+    `<span class="flag ${r.buffett.longTermBusiness ? 'flag-yes' : 'flag-no'}">${r.buffett.longTermBusiness ? '✓' : '✗'} Largo plazo</span>`;
+
+  // Profile score
+  const pm = r.profileMatch;
+  const ps = Math.round(pm.score);
+  document.getElementById('psTitle').textContent = 'Compatibilidad con tu perfil ' + p.name;
+  document.getElementById('psScore').textContent = ps + '%';
+  const psRows = [
+    { label: 'Criterios Graham (' + Math.round(p.gw*100) + '%)', val: gs, color: '#4a90c4' },
+    { label: 'Criterios Buffett (' + Math.round(p.bw*100) + '%)', val: bs, color: '#6aaa3a' },
+    { label: 'Fit con tu perfil (' + Math.round(p.pw*100) + '%)', val: ps, color: p.color }
+  ];
+  document.getElementById('psRows').innerHTML = psRows.map(row => `
+    <div class="ps-row">
+      <div class="ps-label">${row.label}</div>
+      <div class="ps-bar-track"><div class="ps-bar-fill" style="width:${row.val}%;background:${row.color}"></div></div>
+      <div class="ps-pct" style="color:${row.color}">${row.val}</div>
+    </div>
+  `).join('');
+
+  // Final
+  document.getElementById('fWinner').textContent = r.comparison.winner;
+  document.getElementById('fCompat').textContent = pm.compatible ? 'Sí — alineado con tu perfil' : 'No — fuera de tu zona de riesgo';
+  const tags = [];
+  if (r.comparison.isCheap) tags.push('<span class="vtag vtag-q">Precio atractivo</span>');
+  if (r.comparison.isQuality) tags.push('<span class="vtag vtag-q">Alta calidad</span>');
+  if (!r.comparison.isCheap && !r.comparison.isQuality) tags.push('<span class="vtag vtag-n">Sin ventaja clara</span>');
+  if (!pm.compatible) tags.push('<span class="vtag" style="background:rgba(200,60,60,0.2);color:#f0a0a0;border:1px solid rgba(200,60,60,0.4)">Riesgo alto para tu perfil</span>');
+  document.getElementById('fTags').innerHTML = tags.join('');
+  document.getElementById('fRec').textContent = r.comparison.finalRecommendation;
+
+  if (pm.warnings && pm.warnings.length > 0) {
+    document.getElementById('fRec').textContent += ' ⚠ ' + pm.warnings.join(' ');
+  }
+
+  document.getElementById('resultsBox').style.display = 'block';
+  document.getElementById('resultsBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════════
+// NAV HELPERS
+// ══════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const sc = document.getElementById('sc'+i);
+    sc.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+  [1,2].forEach(i => {
+    const sl = document.getElementById('sl'+i);
+    sl.className = 'step-line' + (i < n ? ' done' : '');
+  });
+}
+
+function goBack() { showSection('secProfile'); setStep(2); }
+
+function restartQuiz() {
+  answers = []; current = 0; userProfile = null;
+  setStep(1); showSection('secQuiz'); renderQuiz();
+}
+
+function clearResults() {
+  document.getElementById('resultsBox').style.display = 'none';
+  document.getElementById('tickerInput').value = '';
+  document.getElementById('errorBox').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const sec = document.querySelector('.section.active');
+    if (sec && sec.id === 'secAnalyzer') analyze();
+    else if (sec && sec.id === 'secQuiz') quizNext();
+  }
+});
+
+// INIT
+renderQuiz();
+</script>
+</body>
+</html>

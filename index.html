@@ -741,8 +741,6 @@ async function loadMarketData() {
 // ── RECOMMENDATIONS ──
 async function loadRecommendations() {
   if (!userProfile) return;
-  const apiKey = localStorage.getItem('anthropic_api_key');
-  if (!apiKey) return;
   const p = profiles[userProfile.type];
   const el = document.getElementById('dashRecs');
   el.innerHTML = '<div style="font-size:13px;color:var(--muted)">Generando recomendaciones...</div>';
@@ -754,10 +752,10 @@ Responde SOLO con JSON válido sin backticks:
 
 Incluye mix de: acciones, ETFs, cripto si aplica al perfil. Usa datos reales actuales.`;
 
-    const resp = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'),{
+    const resp = await fetch('/.netlify/functions/analyze',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mode:'recommendations',profileType:userProfile.type,profileName:p.name,profileSub:p.sub})
     });
     const data = await resp.json();
     const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
@@ -814,17 +812,15 @@ Responde SOLO con JSON válido sin backticks ni markdown:
   "comparison":{"winner":"Graham/Buffett/Ambos/Ninguno","isCheap":true/false,"isQuality":true/false,"finalVerdict":"Comprar/Esperar/Evitar","recommendation":"3 oraciones en español sencillo para perfil ${profileType}"}
 }`;
 
-    const body = JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]});
-    const resp = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'),{
+    const resp = await fetch('/.netlify/functions/analyze',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
-      body
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mode:'analyze',ticker,profileType:userProfile?.type||'moderado',profileName:p.name,profileSub:p.sub})
     });
-    if (resp.status===401) { localStorage.removeItem('anthropic_api_key'); updateApiStatus(); showApiModal(); throw new Error('API key inválida'); }
+    if (!resp.ok) throw new Error('Error ' + resp.status);
     clearInterval(interval);
-    const data = await resp.json();
-    const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
-    const r = JSON.parse(raw);
+    const r = await resp.json();
+    if (r.error) throw new Error(r.error);
     renderAnalysis(r);
     await saveAnalysis(r);
     loadHistory();

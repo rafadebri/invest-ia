@@ -709,8 +709,101 @@ select option { background: var(--ink3); }
 }
 
 /* ═══════════════════════════════════════════════
-   ASIGNADOR DE CAPITAL
+   COMPARADOR
 ═══════════════════════════════════════════════ */
+.comp-inputs { display: flex; gap: 10px; align-items: flex-end; margin-bottom:14px; }
+.comp-inputs input { flex: 1; }
+.comp-vs {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--paper3); padding: 0 4px;
+  flex-shrink: 0; padding-bottom: 12px;
+}
+
+.comp-ganador {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; border-radius: var(--r3);
+  margin-bottom: 16px;
+  background: var(--gold3); border: 1px solid rgba(201,151,58,0.3);
+}
+.comp-ganador-crown { font-size: 28px; flex-shrink: 0; }
+.comp-ganador-ticker {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; color: var(--gold); line-height: 1;
+}
+.comp-ganador-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--paper3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.comp-ganador-razon { font-size: 13px; color: var(--paper2); line-height: 1.6; margin-top: 6px; }
+
+.comp-grid { display: grid; gap: 14px; margin-bottom: 16px; }
+.comp-grid.two  { grid-template-columns: 1fr 1fr; }
+.comp-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.comp-card {
+  background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r2); padding: 20px;
+  border-top: 3px solid var(--c, var(--line));
+  position: relative;
+}
+.comp-card.winner { border-color: var(--gold); border-top-color: var(--gold); }
+.comp-winner-badge {
+  position: absolute; top: -10px; right: 16px;
+  background: var(--gold); color: var(--ink);
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: 0.1em; padding: 3px 10px;
+  border-radius: 10px; font-weight: 700; text-transform: uppercase;
+}
+.comp-ticker {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; color: var(--paper); margin-bottom: 2px;
+}
+.comp-nombre { font-size: 12px; color: var(--paper3); margin-bottom: 12px; }
+.comp-score-compuesto {
+  font-family: 'DM Serif Display', serif;
+  font-size: 44px; line-height: 1; margin-bottom: 4px;
+}
+.comp-veredicto { margin-bottom: 14px; }
+
+.comp-scores-mini { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 14px; }
+.comp-score-mini {
+  background: var(--ink3); border-radius: 8px;
+  padding: 8px; text-align: center;
+}
+.comp-score-mini-val { font-size: 16px; font-weight: 700; }
+.comp-score-mini-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; color: var(--paper3); letter-spacing: 0.06em;
+  text-transform: uppercase; margin-top: 2px;
+}
+
+.comp-fortalezas { margin-bottom: 10px; }
+.comp-item {
+  font-size: 12px; color: var(--paper2); padding: 4px 0;
+  border-bottom: 1px solid var(--line); line-height: 1.4;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.comp-item-dot { flex-shrink: 0; margin-top: 5px; font-size: 8px; }
+.comp-resumen-maestros {
+  font-size: 12px; color: var(--paper3); line-height: 1.65;
+  padding-top: 10px; border-top: 1px solid var(--line);
+}
+
+.comp-directa { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.comp-directa-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 12px 16px;
+}
+.comp-criterio { font-size: 13px; color: var(--paper3); flex: 1; }
+.comp-ganador-tag {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  font-weight: 700; padding: 3px 10px; border-radius: 8px;
+  background: var(--gold3); color: var(--gold); flex-shrink: 0;
+}
+.comp-directa-exp { font-size: 12px; color: var(--paper3); margin-top: 4px; }
+</style>
 .alloc-hero {
   display: flex; align-items: center; gap: 20px;
   padding: 24px; background: var(--ink2);
@@ -868,7 +961,6 @@ select option { background: var(--ink3); }
       <button class="nav-item" data-tab="comparar">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8h6V2h2v6h6v2H9v6H7v-6H1V8z"/></svg>
         Comparador
-        <span class="nav-soon">pronto</span>
       </button>
       <button class="nav-item" data-tab="simular">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h1v12H2V2zm2 10l3-6 3 4 2-3 2 5H4z"/></svg>
@@ -1056,14 +1148,41 @@ select option { background: var(--ink3); }
       <div id="allocResult" style="display:none"></div>
     </div>
 
-    <!-- ── COMING SOON: COMPARAR ── -->
+    <!-- ── COMPARAR ── -->
     <div class="tab" id="tab-comparar">
-      <div class="coming-soon">
-        <div class="cs-icon">⚖️</div>
-        <div class="cs-title">Comparador de Activos</div>
-        <div class="cs-desc">Compara 2 o 3 activos lado a lado con el análisis completo de los 6 maestros para cada uno. Decide cuál es la mejor inversión para ti.</div>
-        <div class="cs-badge">Sesión 4 · En desarrollo</div>
+      <div class="ph">
+        <div class="ph-eyebrow">Análisis Comparativo</div>
+        <h2>Comparador de Activos</h2>
+        <p>2 o 3 activos analizados lado a lado por los 6 maestros</p>
       </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:10px">Activos a comparar (2 o 3)</div>
+        <div class="comp-inputs">
+          <input type="text" id="compTicker1" placeholder="AAPL" style="text-transform:uppercase"/>
+          <span class="comp-vs">vs</span>
+          <input type="text" id="compTicker2" placeholder="MSFT" style="text-transform:uppercase"/>
+          <span class="comp-vs">vs</span>
+          <input type="text" id="compTicker3" placeholder="NVDA (opcional)" style="text-transform:uppercase"/>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px" id="compChips"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--paper3);cursor:pointer">
+            <input type="checkbox" id="compLatam" style="width:auto;height:auto;accent-color:var(--gold)"/>
+            Modo Latam
+          </label>
+        </div>
+        <button class="btn btn-gold btn-lg" id="btnComparar" onclick="compararActivos()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8h6V2h2v6h6v2H9v6H7v-6H1V8z"/></svg>
+          Comparar
+        </button>
+      </div>
+      <div class="loading-box" id="compLoading">
+        <div class="spinner"></div>
+        <p id="compLoadingText">El Consejo está comparando los activos...</p>
+        <div class="loading-sub">Analizando cada activo con los 6 maestros</div>
+      </div>
+      <div class="error-box" id="compError"></div>
+      <div id="compResult" style="display:none"></div>
     </div>
 
     <!-- ── COMING SOON: SIMULAR ── -->
@@ -1889,8 +2008,210 @@ window.deletePortfolioItem = async (id) => {
 };
 
 // ═══════════════════════════════════════════════
-// ASIGNADOR DE CAPITAL
+// COMPARADOR DE ACTIVOS
 // ═══════════════════════════════════════════════
+
+// Chips de ejemplo para el comparador
+const compPares = [
+  ['AAPL','MSFT'],['BTC','ETH'],['NVDA','AMD'],
+  ['KO','PEP'],['SPY','QQQ'],['AAPL','MSFT','NVDA']
+];
+document.getElementById('compChips').innerHTML = compPares.map(p =>
+  `<button class="chip" onclick="setCompPar(${JSON.stringify(p)})">${p.join(' vs ')}</button>`
+).join('');
+
+window.setCompPar = (tickers) => {
+  document.getElementById('compTicker1').value = tickers[0] || '';
+  document.getElementById('compTicker2').value = tickers[1] || '';
+  document.getElementById('compTicker3').value = tickers[2] || '';
+};
+
+window.compararActivos = async () => {
+  const t1 = document.getElementById('compTicker1').value.trim().toUpperCase();
+  const t2 = document.getElementById('compTicker2').value.trim().toUpperCase();
+  const t3 = document.getElementById('compTicker3').value.trim().toUpperCase();
+  const modoLatam = document.getElementById('compLatam').checked;
+
+  if (!t1 || !t2) { alert('Ingresa al menos 2 activos para comparar'); return; }
+  const tickers = [t1, t2, ...(t3 ? [t3] : [])];
+
+  const btn = document.getElementById('btnComparar');
+  const loading = document.getElementById('compLoading');
+  const errorEl = document.getElementById('compError');
+  const result = document.getElementById('compResult');
+
+  btn.disabled = true;
+  loading.style.display = 'block';
+  result.style.display = 'none';
+  errorEl.style.display = 'none';
+
+  const msgs = [
+    `Analizando ${t1} con los 6 maestros...`,
+    `Analizando ${t2} con los 6 maestros...`,
+    t3 ? `Analizando ${t3} con los 6 maestros...` : 'Cruzando criterios de los maestros...',
+    'Determinando el ganador...',
+    'Preparando comparativa final...'
+  ];
+  let mi = 0;
+  const interval = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    document.getElementById('compLoadingText').textContent = msgs[mi];
+  }, 1800);
+
+  try {
+    const p = userProfile ? profiles[userProfile.type] : null;
+    const resp = await fetch('/.netlify/functions/compare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tickers,
+        modoLatam,
+        perfilInversor: p ? {
+          tipo: userProfile.type,
+          riesgo: userProfile.type,
+          horizonte: p.sub
+        } : null
+      })
+    });
+    clearInterval(interval);
+    if (!resp.ok) {
+      const e = await resp.json().catch(() => ({}));
+      throw new Error(e.error || `Error ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    renderComparacion(data);
+  } catch(e) {
+    clearInterval(interval);
+    errorEl.textContent = 'Error: ' + e.message;
+    errorEl.style.display = 'block';
+  }
+  loading.style.display = 'none';
+  btn.disabled = false;
+};
+
+function renderComparacion(r) {
+  const colores = ['#4a7fa5','#4a9e6b','#9b6fd0'];
+  const numActivos = r.activos?.length || 2;
+
+  // Banner ganador
+  let html = `
+    <div class="comp-ganador">
+      <div class="comp-ganador-crown">🏆</div>
+      <div style="flex:1">
+        <div class="comp-ganador-label">Ganador según el Consejo</div>
+        <div class="comp-ganador-ticker">${r.ganadorGeneral || '—'}</div>
+        <div class="comp-ganador-razon">${r.razonGanador || ''}</div>
+      </div>
+    </div>`;
+
+  // Frase maestra
+  if (r.fraseMaestra) {
+    html += `<div class="frase-maestra" style="margin-bottom:16px">"${r.fraseMaestra}"</div>`;
+  }
+
+  // Resumen
+  html += `
+    <div class="card-sm" style="margin-bottom:16px">
+      <div class="field-label" style="margin-bottom:8px">Resumen de la comparación</div>
+      <div style="font-size:14px;color:var(--paper2);line-height:1.75">${r.resumenComparacion||''}</div>
+    </div>`;
+
+  // Cards de activos
+  html += `<div class="comp-grid ${numActivos === 2 ? 'two' : 'three'}" style="margin-bottom:16px">`;
+  (r.activos||[]).forEach((a, idx) => {
+    const color = colores[idx];
+    const isWinner = a.ticker === r.ganadorGeneral;
+    const vc = verdictClass(a.veredicto);
+    const maestroColors = {
+      graham:'var(--graham)',buffett:'var(--buffett)',lynch:'var(--lynch)',
+      dalio:'var(--dalio)',soros:'var(--soros)',munger:'var(--munger)'
+    };
+    const scoresMini = ['graham','buffett','lynch','dalio','soros','munger'].map(m => `
+      <div class="comp-score-mini">
+        <div class="comp-score-mini-val" style="color:${maestroColors[m]}">${Math.round(a.scores?.[m]||0)}</div>
+        <div class="comp-score-mini-label">${m}</div>
+      </div>`).join('');
+
+    html += `
+      <div class="comp-card ${isWinner?'winner':''}" style="--c:${color}">
+        ${isWinner ? '<div class="comp-winner-badge">👑 Ganador</div>' : ''}
+        <div class="comp-ticker">${a.ticker}</div>
+        <div class="comp-nombre">${a.nombre||''} · ${a.tipo||''}</div>
+        <div class="comp-score-compuesto" style="color:${color}">${Math.round(a.scores?.compuesto||0)}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--paper3);margin-bottom:10px">score compuesto /100</div>
+        <div class="comp-veredicto"><span class="badge ${vc}">${a.veredicto||'—'}</span></div>
+        <div class="comp-scores-mini">${scoresMini}</div>
+        <div class="field-label" style="margin-bottom:6px">Fortalezas</div>
+        <div class="comp-fortalezas">
+          ${(a.fortalezas||[]).map(f=>`
+            <div class="comp-item">
+              <span class="comp-item-dot" style="color:var(--green)">●</span>${f}
+            </div>`).join('')}
+        </div>
+        <div class="field-label" style="margin-bottom:6px;margin-top:10px">Debilidades</div>
+        <div class="comp-fortalezas">
+          ${(a.debilidades||[]).map(d=>`
+            <div class="comp-item">
+              <span class="comp-item-dot" style="color:var(--red)">●</span>${d}
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:11px;color:var(--paper3)">✓ Ideal para: <span style="color:var(--paper2)">${a.mejorPara||'—'}</span></div>
+          <div style="font-size:11px;color:var(--paper3)">✗ Evitar si: <span style="color:var(--paper2)">${a.peorPara||'—'}</span></div>
+          <div style="font-size:11px;color:var(--paper3)">⏱ Horizonte: <span style="color:var(--paper2)">${a.horizonteIdeal||'—'}</span></div>
+        </div>
+        <div class="comp-resumen-maestros">${a.resumenMaestros||''}</div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  // Comparativa directa
+  if (r.comparativaDirecta?.length) {
+    html += `
+      <div class="card-sm" style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:12px">Comparativa criterio a criterio</div>
+        <div class="comp-directa">
+          ${r.comparativaDirecta.map(c => `
+            <div class="comp-directa-row">
+              <div style="flex:1">
+                <div class="comp-criterio">${c.criterio}</div>
+                <div class="comp-directa-exp">${c.explicacion}</div>
+              </div>
+              <div class="comp-ganador-tag">${c.ganador}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // Recomendación final + estrategia combinada
+  html += `
+    <div class="rec-personalizada" style="margin-bottom:14px">
+      <div class="rec-pers-label">Recomendación para tu perfil${userProfile ? ' ' + profiles[userProfile.type]?.name : ''}</div>
+      <div class="rec-pers-text">${r.recomendacionFinal||''}</div>
+    </div>`;
+
+  if (r.estrategiaCombinada) {
+    html += `
+      <div class="card-sm" style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:8px">¿Tiene sentido tenerlos juntos?</div>
+        <div style="font-size:14px;color:var(--paper2);line-height:1.75">${r.estrategiaCombinada}</div>
+      </div>`;
+  }
+
+  html += `
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" onclick="document.getElementById('compResult').style.display='none';window.scrollTo({top:0,behavior:'smooth'})">Nueva comparación</button>
+      <button class="btn btn-gold" onclick="goTab('analyzer')">Análisis profundo →</button>
+    </div>`;
+
+  const result = document.getElementById('compResult');
+  result.innerHTML = html;
+  result.style.display = 'block';
+  result.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+</script>
 window.asignarCapital = async () => {
   const capital = parseFloat(document.getElementById('allocCapital').value);
   const moneda  = document.getElementById('allocMoneda').value;

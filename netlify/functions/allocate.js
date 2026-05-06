@@ -131,7 +131,7 @@ Distribuye el capital de forma inteligente, concreta y justificada. Cada peso/d√
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 3000,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],

@@ -707,6 +707,94 @@ select option { background: var(--ink3); }
   .score-hero { flex-direction: column; text-align: center; }
   .h-scores { display: none; }
 }
+
+/* ═══════════════════════════════════════════════
+   ASIGNADOR DE CAPITAL
+═══════════════════════════════════════════════ */
+.alloc-hero {
+  display: flex; align-items: center; gap: 20px;
+  padding: 24px; background: var(--ink2);
+  border: 1px solid var(--line2); border-radius: var(--r3);
+  margin-bottom: 16px;
+}
+.alloc-capital {
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px; color: var(--gold); line-height: 1;
+}
+.alloc-capital-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--paper3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.alloc-perfil { font-size: 13px; color: var(--paper3); margin-top: 6px; }
+.alloc-bars { display: flex; gap: 4px; margin-bottom: 16px; height: 8px; border-radius: 4px; overflow: hidden; }
+.alloc-bar { height: 100%; transition: width 1s ease; }
+.alloc-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.alloc-row {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r2); padding: 16px 20px;
+  transition: border-color 0.2s;
+}
+.alloc-row:hover { border-color: var(--line2); }
+.alloc-ticker {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: var(--paper); width: 72px; flex-shrink: 0;
+}
+.alloc-nombre { font-size: 13px; color: var(--paper2); margin-bottom: 2px; }
+.alloc-tipo {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--paper3); letter-spacing: 0.06em;
+}
+.alloc-maestro-tag {
+  font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  background: var(--gold3); color: var(--gold);
+  font-weight: 600; flex-shrink: 0;
+}
+.alloc-pct-col { text-align: right; flex-shrink: 0; min-width: 80px; }
+.alloc-pct {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px; color: var(--paper); line-height: 1;
+}
+.alloc-monto { font-size: 13px; color: var(--gold); margin-top: 2px; font-weight: 600; }
+.alloc-pct-bar {
+  height: 3px; background: rgba(255,255,255,0.06);
+  border-radius: 2px; overflow: hidden; margin-top: 8px;
+}
+.alloc-pct-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.alloc-justif {
+  font-size: 12px; color: var(--paper3); line-height: 1.6;
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);
+}
+.alloc-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.alloc-meta-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; padding: 2px 8px; border-radius: 8px;
+  background: var(--ink3); color: var(--paper3); border: 1px solid var(--line);
+}
+.dist-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.dist-card {
+  background: var(--ink3); border: 1px solid var(--line);
+  border-radius: var(--r); padding: 14px; text-align: center;
+}
+.dist-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; color: var(--paper); margin-bottom: 2px;
+}
+.dist-label { font-size: 11px; color: var(--paper3); }
+.alloc-next { display: flex; flex-direction: column; gap: 8px; }
+.alloc-next-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; background: var(--ink3);
+  border: 1px solid var(--line); border-radius: var(--r);
+  font-size: 13px; color: var(--paper2); line-height: 1.5;
+}
+.alloc-next-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--gold); flex-shrink: 0;
+  background: var(--gold3); padding: 1px 7px; border-radius: 6px;
+  margin-top: 2px;
+}
 </style>
 </head>
 <body>
@@ -776,7 +864,6 @@ select option { background: var(--ink3); }
       <button class="nav-item" data-tab="asignar">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 4v6l-7 4-7-4V5l7-4z"/></svg>
         Asignador
-        <span class="nav-soon">pronto</span>
       </button>
       <button class="nav-item" data-tab="comparar">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8h6V2h2v6h6v2H9v6H7v-6H1V8z"/></svg>
@@ -920,14 +1007,53 @@ select option { background: var(--ink3); }
       <div id="profileContent"></div>
     </div>
 
-    <!-- ── COMING SOON: ASIGNAR ── -->
+    <!-- ── ASIGNAR ── -->
     <div class="tab" id="tab-asignar">
-      <div class="coming-soon">
-        <div class="cs-icon">🧮</div>
-        <div class="cs-title">Asignador de Capital</div>
-        <div class="cs-desc">Ingresa cuánto dinero tienes y el sistema te dirá exactamente cuánto % poner en cada activo según tu perfil y el análisis de los 6 maestros.</div>
-        <div class="cs-badge">Sesión 3 · En desarrollo</div>
+      <div class="ph">
+        <div class="ph-eyebrow">Inteligencia de Capital</div>
+        <h2>Asignador de Capital</h2>
+        <p>Ingresa cuánto tienes y el Consejo distribuye cada peso de forma óptima</p>
       </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="g2" style="margin-bottom:14px">
+          <div>
+            <span class="field-label">Capital disponible</span>
+            <input type="number" id="allocCapital" placeholder="10000" min="1" step="100"/>
+          </div>
+          <div>
+            <span class="field-label">Moneda</span>
+            <select id="allocMoneda">
+              <option value="USD">🇺🇸 Dólares (USD)</option>
+              <option value="COP">🇨🇴 Pesos colombianos (COP)</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <span class="field-label">Activos a considerar (opcional — déjalo vacío para que la IA elija)</span>
+          <input type="text" id="allocActivos" placeholder="Ej: AAPL, BTC, SPY, KO ... o déjalo vacío"/>
+        </div>
+        <div style="margin-bottom:14px">
+          <span class="field-label">Restricciones o preferencias</span>
+          <input type="text" id="allocRestricciones" placeholder="Ej: no quiero cripto, solo acciones americanas, incluir CDTs..."/>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--paper3);cursor:pointer">
+            <input type="checkbox" id="allocLatam" style="width:auto;height:auto;accent-color:var(--gold)"/>
+            Modo Latam (incluir opciones BVC / COP)
+          </label>
+        </div>
+        <button class="btn btn-gold btn-lg" id="btnAllocar" onclick="asignarCapital()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l7 4v6l-7 4-7-4V5l7-4z"/></svg>
+          Distribuir Capital
+        </button>
+      </div>
+      <div class="loading-box" id="allocLoading">
+        <div class="spinner"></div>
+        <p id="allocLoadingText">El Consejo está construyendo tu portafolio...</p>
+        <div class="loading-sub">Aplicando principios de los 6 maestros</div>
+      </div>
+      <div class="error-box" id="allocError"></div>
+      <div id="allocResult" style="display:none"></div>
     </div>
 
     <!-- ── COMING SOON: COMPARAR ── -->
@@ -1761,6 +1887,222 @@ window.deletePortfolioItem = async (id) => {
   await deleteDoc(doc(db,'portfolio',id));
   loadPortfolio();
 };
+
+// ═══════════════════════════════════════════════
+// ASIGNADOR DE CAPITAL
+// ═══════════════════════════════════════════════
+window.asignarCapital = async () => {
+  const capital = parseFloat(document.getElementById('allocCapital').value);
+  const moneda  = document.getElementById('allocMoneda').value;
+  const activosRaw = document.getElementById('allocActivos').value.trim();
+  const restricciones = document.getElementById('allocRestricciones').value.trim();
+  const modoLatam = document.getElementById('allocLatam').checked;
+
+  if (!capital || capital <= 0) { alert('Ingresa un capital válido mayor a 0'); return; }
+
+  const activos = activosRaw
+    ? activosRaw.split(',').map(a => a.trim().toUpperCase()).filter(Boolean)
+    : [];
+
+  const btn = document.getElementById('btnAllocar');
+  const loading = document.getElementById('allocLoading');
+  const errorEl = document.getElementById('allocError');
+  const result = document.getElementById('allocResult');
+
+  btn.disabled = true;
+  loading.style.display = 'block';
+  result.style.display = 'none';
+  errorEl.style.display = 'none';
+
+  const msgs = [
+    'Graham analizando el valor intrínseco de cada activo...',
+    'Buffett evaluando moats y calidad de negocios...',
+    'Dalio balanceando riesgo y correlaciones...',
+    'Lynch seleccionando empresas por su historia...',
+    'Munger aplicando modelos mentales al portafolio...',
+    'Construyendo tu asignación óptima...'
+  ];
+  let mi = 0;
+  const interval = setInterval(() => {
+    mi = (mi + 1) % msgs.length;
+    document.getElementById('allocLoadingText').textContent = msgs[mi];
+  }, 1800);
+
+  try {
+    const p = userProfile ? profiles[userProfile.type] : null;
+    const resp = await fetch('/.netlify/functions/allocate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        capitalDisponible: capital,
+        moneda,
+        activos,
+        restricciones: restricciones || null,
+        modoLatam,
+        perfilInversor: p ? {
+          tipo: userProfile.type,
+          riesgo: userProfile.type,
+          horizonte: p.sub,
+          objetivo: p.desc?.substring(0, 80)
+        } : null
+      })
+    });
+    clearInterval(interval);
+    if (!resp.ok) {
+      const e = await resp.json().catch(() => ({}));
+      throw new Error(e.error || `Error ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    renderAsignacion(data);
+  } catch(e) {
+    clearInterval(interval);
+    errorEl.textContent = 'Error: ' + e.message;
+    errorEl.style.display = 'block';
+  }
+  loading.style.display = 'none';
+  btn.disabled = false;
+};
+
+function renderAsignacion(r) {
+  const fmt = (n) => r.moneda === 'COP'
+    ? '$' + Math.round(n).toLocaleString('es-CO') + ' COP'
+    : '$' + n.toLocaleString('en-US', {minimumFractionDigits:0,maximumFractionDigits:0}) + ' USD';
+
+  const colorTipo = {
+    'Acción':'#4a9e6b','ETF':'#4a7fa5','Cripto':'#9b6fd0',
+    'Renta Fija':'#4a8fa5','Commodity':'#c97a3a','Liquidez':'#888'
+  };
+
+  // Hero
+  let html = `
+    <div class="alloc-hero">
+      <div style="flex:1">
+        <div class="alloc-capital-label">Capital a invertir</div>
+        <div class="alloc-capital">${fmt(r.capitalTotal)}</div>
+        <div class="alloc-perfil">Perfil: ${r.perfilUsado} · ${r.asignaciones?.length||0} posiciones</div>
+      </div>
+      <div style="text-align:right">
+        <div class="alloc-capital-label">Fecha</div>
+        <div style="font-size:13px;color:var(--paper2)">${new Date(r.fechaAsignacion||Date.now()).toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'})}</div>
+      </div>
+    </div>`;
+
+  // Barra visual
+  if (r.asignaciones?.length) {
+    const bars = r.asignaciones.map(a =>
+      `<div class="alloc-bar" style="width:${a.porcentaje}%;background:${colorTipo[a.tipo]||'#888'}" title="${a.ticker} ${a.porcentaje}%"></div>`
+    ).join('');
+    const legend = r.asignaciones.map(a =>
+      `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--paper3)">
+        <div style="width:8px;height:8px;border-radius:2px;background:${colorTipo[a.tipo]||'#888'};flex-shrink:0"></div>
+        ${a.ticker} ${a.porcentaje}%
+      </div>`
+    ).join('');
+    html += `
+      <div style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:8px">Distribución visual</div>
+        <div class="alloc-bars">${bars}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${legend}</div>
+      </div>`;
+  }
+
+  // Frase + estrategia
+  html += `
+    <div class="frase-maestra" style="margin-bottom:16px">"${r.fraseMaestra||''}"</div>
+    <div class="card-sm" style="margin-bottom:16px">
+      <div class="field-label" style="margin-bottom:8px">Estrategia del Consejo</div>
+      <div style="font-size:14px;color:var(--paper2);line-height:1.75">${r.resumenEstrategia||''}</div>
+    </div>`;
+
+  // Asignaciones
+  html += `<div class="field-label" style="margin-bottom:10px">Asignación detallada</div><div class="alloc-grid">`;
+  const riesgoColors = {'Bajo':'#4a9e6b','Medio':'#c97a3a','Alto':'#c94a4a','Muy Alto':'#c94a4a'};
+  (r.asignaciones||[]).forEach(a => {
+    const color = colorTipo[a.tipo]||'#888';
+    html += `
+      <div class="alloc-row">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">
+            <div class="alloc-ticker">${a.ticker}</div>
+            <div>
+              <div class="alloc-nombre">${a.nombre}</div>
+              <div class="alloc-tipo">${a.tipo}</div>
+            </div>
+            <div class="alloc-maestro-tag">${a.maestroPrincipal}</div>
+          </div>
+          <div class="alloc-pct-bar">
+            <div class="alloc-pct-fill" style="width:${a.porcentaje}%;background:${color}"></div>
+          </div>
+          <div class="alloc-justif">${a.justificacion}</div>
+          <div class="alloc-meta">
+            <span class="alloc-meta-pill" style="color:${riesgoColors[a.riesgo]||'var(--paper3)'}">Riesgo: ${a.riesgo}</span>
+            <span class="alloc-meta-pill">⏱ ${a.horizonteSugerido}</span>
+            <span class="alloc-meta-pill">Entrada: ${a.precioEntradaSugerido}</span>
+          </div>
+        </div>
+        <div class="alloc-pct-col">
+          <div class="alloc-pct">${a.porcentaje}%</div>
+          <div class="alloc-monto">${fmt(a.montoAsignado)}</div>
+        </div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  // Distribución por tipo
+  const dist = r.distribucionPorTipo||{};
+  const distItems = [
+    ['Acciones',dist.acciones],['ETFs',dist.etfs],['Cripto',dist.cripto],
+    ['Renta Fija',dist.rentaFija],['Commodities',dist.commodities],['Liquidez',dist.liquidez]
+  ].filter(([,v])=>v>0);
+  if (distItems.length) {
+    html += `
+      <div class="card-sm" style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:12px">Distribución por categoría</div>
+        <div class="dist-grid">
+          ${distItems.map(([label,val])=>`
+            <div class="dist-card">
+              <div class="dist-val">${val}%</div>
+              <div class="dist-label">${label}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // Advertencias
+  if (r.advertencias?.length) {
+    html += `
+      <div class="card-sm" style="margin-bottom:16px;border-color:rgba(201,122,58,0.3)">
+        <div class="field-label" style="margin-bottom:10px;color:var(--amber)">⚠ Advertencias</div>
+        ${r.advertencias.map(w=>`<div style="font-size:13px;color:var(--paper2);padding:5px 0;border-bottom:1px solid var(--line);line-height:1.5">${w}</div>`).join('')}
+      </div>`;
+  }
+
+  // Próximos pasos
+  if (r.proximospasos?.length) {
+    html += `
+      <div class="card-sm" style="margin-bottom:16px">
+        <div class="field-label" style="margin-bottom:12px">Próximos pasos</div>
+        <div class="alloc-next">
+          ${r.proximospasos.map((paso,i)=>`
+            <div class="alloc-next-item">
+              <span class="alloc-next-num">${i+1}</span>${paso}
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  html += `
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" onclick="document.getElementById('allocResult').style.display='none';document.getElementById('allocCapital').value='';window.scrollTo({top:0,behavior:'smooth'})">Nueva asignación</button>
+      <button class="btn btn-gold" onclick="goTab('analyzer')">Analizar un activo →</button>
+    </div>`;
+
+  const result = document.getElementById('allocResult');
+  result.innerHTML = html;
+  result.style.display = 'block';
+  result.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
 </script>
 </body>

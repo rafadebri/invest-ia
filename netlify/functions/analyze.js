@@ -195,7 +195,7 @@ Proporciona un análisis profundo, honesto y accionable. Si el activo tiene prob
     });
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 4000,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],

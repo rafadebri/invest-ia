@@ -86,7 +86,7 @@ Responde ÚNICAMENTE con JSON válido sin backticks ni markdown:
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: "claude-sonnet-4-5-20251001",
       max_tokens: 1800,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],

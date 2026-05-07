@@ -1818,7 +1818,7 @@ window.analyze = async () => {
       } : null
     };
 
-    const resp = await fetch('/.netlify/functions/analyze', {
+    const resp = await fetch('https://invest-ia-server.onrender.com/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
@@ -2183,7 +2183,7 @@ window.compararActivos = async () => {
 
   try {
     const p = userProfile ? profiles[userProfile.type] : null;
-    const resp = await fetch('/.netlify/functions/compare', {
+    const resp = await fetch('https://invest-ia-server.onrender.com/compare', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2373,7 +2373,7 @@ window.asignarCapital = async () => {
 
   try {
     const p = userProfile ? profiles[userProfile.type] : null;
-    const resp = await fetch('/.netlify/functions/allocate', {
+    const resp = await fetch('https://invest-ia-server.onrender.com/allocate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

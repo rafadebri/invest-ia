@@ -887,6 +887,58 @@ select option { background: var(--ink3); }
   background: var(--gold3); padding: 1px 7px; border-radius: 6px;
   margin-top: 2px;
 }
+
+/* ═══════════════════════════════════════════════
+   SIMULADOR HISTÓRICO
+═══════════════════════════════════════════════ */
+.sim-result-hero {
+  background: var(--ink2); border: 1px solid var(--line2);
+  border-radius: var(--r3); padding: 28px;
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 16px;
+}
+.sim-return-circle {
+  width: 110px; height: 110px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  border: 3px solid var(--c, #3d9e6b);
+}
+.sim-return-pct {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px; line-height: 1; color: var(--c, #3d9e6b);
+}
+.sim-return-label { font-size: 10px; color: var(--paper3); margin-top: 3px; }
+.sim-hero-info { flex: 1; }
+.sim-ticker-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--gold); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.sim-company { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--paper); margin-bottom: 10px; }
+.sim-stats-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.sim-stat-val { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); }
+.sim-stat-label { font-size: 11px; color: var(--paper3); margin-top: 2px; }
+.sim-chart-wrap { background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r2); padding: 20px; margin-bottom: 16px; }
+.sim-chart-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--paper3); text-transform: uppercase; margin-bottom: 14px; }
+.sim-milestone { display: flex; align-items: center; gap: 12px; background: var(--ink2); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 16px; margin-bottom: 8px; }
+.sim-milestone-year { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); width: 45px; flex-shrink: 0; }
+.sim-milestone-val { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--paper); width: 110px; flex-shrink: 0; }
+.sim-milestone-ret { font-size: 12px; flex: 1; }
+
+/* ═══════════════════════════════════════════════
+   DIARIO DE INVERSIÓN
+═══════════════════════════════════════════════ */
+.diario-entry {
+  background: var(--ink2); border: 1px solid var(--line);
+  border-radius: var(--r2); padding: 18px; margin-bottom: 10px;
+}
+.diario-entry-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.diario-tipo-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--gold3); color: var(--gold); font-weight: 600; }
+.diario-ticker-tag { font-family: 'DM Mono', monospace; font-size: 11px; padding: 3px 10px; border-radius: 8px; background: var(--ink3); color: var(--paper3); border: 1px solid var(--line); }
+.diario-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--paper3); margin-left: auto; }
+.diario-texto { font-size: 14px; color: var(--paper2); line-height: 1.7; margin-bottom: 10px; }
+.diario-animo { font-size: 12px; color: var(--paper3); }
+
 </style>
 </head>
 <body>
@@ -964,12 +1016,10 @@ select option { background: var(--ink3); }
       <button class="nav-item" data-tab="simular">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h1v12H2V2zm2 10l3-6 3 4 2-3 2 5H4z"/></svg>
         Simulador
-        <span class="nav-soon">pronto</span>
       </button>
       <button class="nav-item" data-tab="diario">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M3 1h10a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 3v1h8V4H4zm0 3v1h8V7H4zm0 3v1h5v-1H4z"/></svg>
         Diario
-        <span class="nav-soon">pronto</span>
       </button>
 
       <div class="nav-section-label" style="margin-top:8px">Cuenta</div>
@@ -1185,23 +1235,96 @@ select option { background: var(--ink3); }
     </div>
 
     <!-- ── COMING SOON: SIMULAR ── -->
+    <!-- ── SIMULADOR HISTÓRICO ── -->
     <div class="tab" id="tab-simular">
-      <div class="coming-soon">
-        <div class="cs-icon">📊</div>
-        <div class="cs-title">Simulador Histórico</div>
-        <div class="cs-desc">¿Cuánto hubieras ganado si hubieras invertido $1,000 en AAPL hace 10 años? Simula portafolios históricos y aprende de los datos.</div>
-        <div class="cs-badge">Sesión 5 · En desarrollo</div>
+      <div class="ph">
+        <div class="ph-eyebrow">Máquina del Tiempo</div>
+        <h2>Simulador Histórico</h2>
+        <p>¿Cuánto hubieras ganado? Datos reales de mercado</p>
       </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="g2" style="margin-bottom:14px">
+          <div>
+            <span class="field-label">Ticker</span>
+            <input type="text" id="simTicker" placeholder="AAPL, MSFT, BTC-USD, SPY..." style="text-transform:uppercase"/>
+          </div>
+          <div>
+            <span class="field-label">Capital invertido (USD)</span>
+            <input type="number" id="simCapital" placeholder="1000" min="1"/>
+          </div>
+        </div>
+        <div class="g2" style="margin-bottom:20px">
+          <div>
+            <span class="field-label">Fecha de inicio</span>
+            <input type="date" id="simFechaInicio" max="2024-12-31"/>
+          </div>
+          <div>
+            <span class="field-label">Fecha de fin</span>
+            <input type="date" id="simFechaFin"/>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+          <button class="chip" onclick="setSimPreset('AAPL','2015-01-01','2025-01-01',1000)">AAPL 10 años</button>
+          <button class="chip" onclick="setSimPreset('BTC-USD','2020-01-01','2025-01-01',1000)">BTC 5 años</button>
+          <button class="chip" onclick="setSimPreset('SPY','2010-01-01','2025-01-01',1000)">SPY 15 años</button>
+          <button class="chip" onclick="setSimPreset('NVDA','2019-01-01','2025-01-01',1000)">NVDA 6 años</button>
+          <button class="chip" onclick="setSimPreset('MSFT','2015-01-01','2025-01-01',1000)">MSFT 10 años</button>
+          <button class="chip" onclick="setSimPreset('TSLA','2020-01-01','2025-01-01',1000)">TSLA 5 años</button>
+        </div>
+        <button class="btn btn-gold btn-lg" id="btnSimular" onclick="simular()">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h1v12H2V2zm2 10l3-6 3 4 2-3 2 5H4z"/></svg>
+          Simular
+        </button>
+      </div>
+      <div class="loading-box" id="simLoading">
+        <div class="spinner"></div>
+        <p>Obteniendo datos históricos...</p>
+      </div>
+      <div class="error-box" id="simError"></div>
+      <div id="simResult" style="display:none"></div>
     </div>
 
-    <!-- ── COMING SOON: DIARIO ── -->
+    <!-- ── DIARIO DE INVERSIÓN ── -->
     <div class="tab" id="tab-diario">
-      <div class="coming-soon">
-        <div class="cs-icon">📓</div>
-        <div class="cs-title">Diario de Inversión</div>
-        <div class="cs-desc">Registra tus decisiones, emociones y razonamientos. La IA analiza tus patrones y te ayuda a evitar sesgos cognitivos.</div>
-        <div class="cs-badge">Sesión 6 · En desarrollo</div>
+      <div class="ph">
+        <div class="ph-eyebrow">Registro Personal</div>
+        <h2>Diario de Inversión</h2>
+        <p>Registra tus decisiones y aprende de tus patrones</p>
       </div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">Nueva entrada</div>
+        <div class="g2" style="margin-bottom:12px">
+          <div>
+            <span class="field-label">Ticker (opcional)</span>
+            <input type="text" id="diarioTicker" placeholder="AAPL" style="text-transform:uppercase"/>
+          </div>
+          <div>
+            <span class="field-label">Tipo de entrada</span>
+            <select id="diarioTipo">
+              <option value="decision">📋 Decisión de inversión</option>
+              <option value="analisis">🔍 Análisis personal</option>
+              <option value="emocion">💭 Estado emocional</option>
+              <option value="leccion">📚 Lección aprendida</option>
+              <option value="idea">💡 Idea de inversión</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <span class="field-label">Entrada</span>
+          <textarea id="diarioTexto" placeholder="Escribe aquí tu razonamiento, decisión o reflexión..." style="min-height:100px"></textarea>
+        </div>
+        <div style="margin-bottom:16px">
+          <span class="field-label">Estado de ánimo (1-10)</span>
+          <input type="range" id="diarioAnimo" min="1" max="10" value="5" style="height:auto;padding:8px 0" oninput="document.getElementById('animoVal').textContent=this.value"/>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--paper3);margin-top:4px">
+            <span>😰 Ansioso</span>
+            <span id="animoVal" style="color:var(--gold);font-weight:600">5</span>
+            <span>😊 Confiado</span>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="guardarDiario()">+ Guardar entrada</button>
+      </div>
+      <div id="diarioList"></div>
     </div>
 
   </div><!-- /main -->
@@ -1309,6 +1432,7 @@ window.goTab = (tab) => {
   });
   if (tab === 'history') loadHistory();
   if (tab === 'portfolio') loadPortfolio();
+  if (tab === 'diario') loadDiario();
 };
 
 document.querySelectorAll('.nav-item').forEach(btn => {
@@ -2422,6 +2546,291 @@ function renderAsignacion(r) {
   result.style.display = 'block';
   result.scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// ═══════════════════════════════════════════════
+// SIMULADOR HISTÓRICO
+// ═══════════════════════════════════════════════
+
+window.setSimPreset = (ticker, inicio, fin, capital) => {
+  document.getElementById('simTicker').value = ticker;
+  document.getElementById('simFechaInicio').value = inicio;
+  document.getElementById('simFechaFin').value = fin;
+  document.getElementById('simCapital').value = capital;
+};
+
+// Set default dates
+document.getElementById('simFechaInicio').value = '2020-01-01';
+document.getElementById('simFechaFin').value = new Date().toISOString().split('T')[0];
+
+window.simular = async () => {
+  const ticker = document.getElementById('simTicker').value.trim().toUpperCase();
+  const capital = parseFloat(document.getElementById('simCapital').value);
+  const fechaInicio = document.getElementById('simFechaInicio').value;
+  const fechaFin = document.getElementById('simFechaFin').value;
+
+  if (!ticker || !capital || !fechaInicio || !fechaFin) {
+    alert('Completa todos los campos'); return;
+  }
+
+  const loading = document.getElementById('simLoading');
+  const errorEl = document.getElementById('simError');
+  const result = document.getElementById('simResult');
+  const btn = document.getElementById('btnSimular');
+
+  btn.disabled = true;
+  loading.style.display = 'block';
+  result.style.display = 'none';
+  errorEl.style.display = 'none';
+
+  try {
+    const inicio = Math.floor(new Date(fechaInicio).getTime() / 1000);
+    const fin = Math.floor(new Date(fechaFin).getTime() / 1000);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1mo&period1=${inicio}&period2=${fin}`;
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+
+    const resp = await fetch(proxy);
+    const data = await resp.json();
+    const parsed = JSON.parse(data.contents);
+    const result_data = parsed?.chart?.result?.[0];
+
+    if (!result_data) throw new Error('No se encontraron datos para ' + ticker);
+
+    const meta = result_data.meta;
+    const timestamps = result_data.timestamp;
+    const closes = result_data.indicators?.quote?.[0]?.close;
+
+    if (!timestamps || !closes) throw new Error('Datos insuficientes');
+
+    // Filtrar nulls
+    const puntos = timestamps.map((t, i) => ({ t, p: closes[i] })).filter(p => p.p != null);
+    if (puntos.length < 2) throw new Error('No hay suficientes datos históricos');
+
+    const precioInicio = puntos[0].p;
+    const precioFin = puntos[puntos.length - 1].p;
+    const retornoTotal = ((precioFin - precioInicio) / precioInicio) * 100;
+    const capitalFinal = capital * (precioFin / precioInicio);
+    const ganancia = capitalFinal - capital;
+    const años = (fin - inicio) / (365 * 24 * 3600);
+    const cagr = (Math.pow(precioFin / precioInicio, 1 / Math.max(años, 0.1)) - 1) * 100;
+    const maxPrecio = Math.max(...puntos.map(p => p.p));
+    const minPrecio = Math.min(...puntos.map(p => p.p));
+    const drawdown = ((minPrecio - precioInicio) / precioInicio) * 100;
+
+    const color = retornoTotal >= 0 ? '#3d9e6b' : '#c94a4a';
+    const fmt = (n) => '$' + n.toLocaleString('en-US', {minimumFractionDigits:0, maximumFractionDigits:0});
+    const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
+
+    // Generar puntos del mini chart SVG
+    const maxP = Math.max(...puntos.map(p => p.p));
+    const minP = Math.min(...puntos.map(p => p.p));
+    const range = maxP - minP || 1;
+    const W = 600, H = 150;
+    const svgPoints = puntos.map((p, i) => {
+      const x = (i / (puntos.length - 1)) * W;
+      const y = H - ((p.p - minP) / range) * H;
+      return `${x},${y}`;
+    }).join(' ');
+
+    // Hitos anuales
+    const hitos = [];
+    const añosUnicos = [...new Set(puntos.map(p => new Date(p.t * 1000).getFullYear()))];
+    añosUnicos.forEach(año => {
+      const puntosAño = puntos.filter(p => new Date(p.t * 1000).getFullYear() === año);
+      if (puntosAño.length > 0) {
+        const precioAño = puntosAño[puntosAño.length - 1].p;
+        const valorAño = capital * (precioAño / precioInicio);
+        const retAño = ((precioAño - precioInicio) / precioInicio) * 100;
+        hitos.push({ año, valor: valorAño, ret: retAño });
+      }
+    });
+
+    let html = `
+      <div class="sim-result-hero">
+        <div class="sim-return-circle" style="--c:${color}">
+          <div class="sim-return-pct" style="color:${color}">${fmtPct(retornoTotal)}</div>
+          <div class="sim-return-label">retorno total</div>
+        </div>
+        <div class="sim-hero-info">
+          <div class="sim-ticker-label">${ticker} · ${meta.currency || 'USD'} · ${meta.exchangeName || ''}</div>
+          <div class="sim-company">${meta.longName || ticker}</div>
+          <div class="sim-stats-row">
+            <div class="sim-stat">
+              <div class="sim-stat-val">${fmt(capital)}</div>
+              <div class="sim-stat-label">invertido</div>
+            </div>
+            <div class="sim-stat">
+              <div class="sim-stat-val" style="color:${color}">${fmt(capitalFinal)}</div>
+              <div class="sim-stat-label">valor final</div>
+            </div>
+            <div class="sim-stat">
+              <div class="sim-stat-val" style="color:${color}">${ganancia >= 0 ? '+' : ''}${fmt(ganancia)}</div>
+              <div class="sim-stat-label">ganancia/pérdida</div>
+            </div>
+            <div class="sim-stat">
+              <div class="sim-stat-val">${cagr.toFixed(1)}%</div>
+              <div class="sim-stat-label">CAGR anual</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-chart-wrap">
+        <div class="sim-chart-label">Evolución del precio · ${new Date(fechaInicio).toLocaleDateString('es-CO', {month:'short',year:'numeric'})} → ${new Date(fechaFin).toLocaleDateString('es-CO', {month:'short',year:'numeric'})}</div>
+        <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:160px;width:100%">
+          <defs>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <polygon points="${svgPoints} ${W},${H} 0,${H}" fill="url(#chartGrad)"/>
+          <polyline points="${svgPoints}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--paper3);margin-top:8px">
+          <span>$${precioInicio.toFixed(2)}</span>
+          <span style="color:${color}">$${precioFin.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div class="g2" style="margin-bottom:16px">
+        <div class="card-sm">
+          <div class="field-label" style="margin-bottom:10px">Datos del período</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--paper3)">Precio inicial</span>
+              <span>$${precioInicio.toFixed(2)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--paper3)">Precio final</span>
+              <span style="color:${color}">$${precioFin.toFixed(2)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--paper3)">Precio máximo</span>
+              <span>$${maxPrecio.toFixed(2)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--paper3)">Precio mínimo</span>
+              <span>$${minPrecio.toFixed(2)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px">
+              <span style="color:var(--paper3)">Max drawdown</span>
+              <span style="color:var(--red)">${drawdown.toFixed(1)}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-sm">
+          <div class="field-label" style="margin-bottom:10px">¿Y si hubieras invertido más?</div>
+          ${[1000, 5000, 10000, 50000].map(c => `
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+              <span style="color:var(--paper3)">${fmt(c)}</span>
+              <span style="color:${c * (precioFin/precioInicio) > c ? 'var(--green)' : 'var(--red)'}">${fmt(c * (precioFin/precioInicio))}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="field-label" style="margin-bottom:10px">Hitos anuales</div>
+      ${hitos.map(h => `
+        <div class="sim-milestone">
+          <div class="sim-milestone-year">${h.año}</div>
+          <div class="sim-milestone-val" style="color:${h.ret >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(h.valor)}</div>
+          <div class="sim-milestone-ret" style="color:${h.ret >= 0 ? 'var(--green)' : 'var(--red)'}">
+            ${fmtPct(h.ret)} vs inversión inicial
+          </div>
+        </div>`).join('')}
+
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" onclick="document.getElementById('simResult').style.display='none'">Nueva simulación</button>
+        <button class="btn btn-gold" onclick="document.getElementById('tickerInput').value='${ticker}';goTab('analyzer')">Analizar ${ticker} →</button>
+      </div>`;
+
+    const resultEl = document.getElementById('simResult');
+    resultEl.innerHTML = html;
+    resultEl.style.display = 'block';
+    resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+
+  } catch(e) {
+    errorEl.textContent = 'Error: ' + e.message + '. Verifica el ticker y las fechas.';
+    errorEl.style.display = 'block';
+  }
+
+  loading.style.display = 'none';
+  btn.disabled = false;
+};
+
+// ═══════════════════════════════════════════════
+// DIARIO DE INVERSIÓN
+// ═══════════════════════════════════════════════
+
+async function loadDiario() {
+  if (!currentUser) return;
+  const el = document.getElementById('diarioList');
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    const q = query(
+      collection(db,'diario'),
+      where('userId','==',currentUser.uid),
+      orderBy('createdAt','desc')
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      el.innerHTML = '<div class="empty"><p>Aún no tienes entradas.<br>Registra tu primera decisión de inversión arriba.</p></div>';
+      return;
+    }
+    const tipos = {
+      'decision': '📋 Decisión',
+      'analisis': '🔍 Análisis',
+      'emocion': '💭 Emoción',
+      'leccion': '📚 Lección',
+      'idea': '💡 Idea'
+    };
+    snap.forEach(d => {
+      const r = d.data();
+      const date = new Date(r.createdAt).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+      const div = document.createElement('div');
+      div.className = 'diario-entry';
+      div.innerHTML = `
+        <div class="diario-entry-header">
+          <span class="diario-tipo-badge">${tipos[r.tipo]||r.tipo}</span>
+          ${r.ticker ? `<span class="diario-ticker-tag">${r.ticker}</span>` : ''}
+          <span class="diario-date">${date}</span>
+          <button onclick="deleteDiario('${d.id}')" class="btn-del" style="margin-left:8px">×</button>
+        </div>
+        <div class="diario-texto">${r.texto}</div>
+        <div class="diario-animo">Estado de ánimo: ${'●'.repeat(Math.round(r.animo/2))}${'○'.repeat(5-Math.round(r.animo/2))} ${r.animo}/10</div>`;
+      el.appendChild(div);
+    });
+  } catch(e) { console.error('Diario error:', e); }
+}
+
+window.guardarDiario = async () => {
+  const ticker = document.getElementById('diarioTicker').value.trim().toUpperCase();
+  const tipo = document.getElementById('diarioTipo').value;
+  const texto = document.getElementById('diarioTexto').value.trim();
+  const animo = parseInt(document.getElementById('diarioAnimo').value);
+
+  if (!texto) { alert('Escribe algo en tu entrada'); return; }
+
+  await addDoc(collection(db,'diario'), {
+    userId: currentUser.uid,
+    ticker: ticker || null,
+    tipo, texto, animo,
+    createdAt: new Date().toISOString()
+  });
+
+  document.getElementById('diarioTicker').value = '';
+  document.getElementById('diarioTexto').value = '';
+  document.getElementById('diarioAnimo').value = '5';
+  document.getElementById('animoVal').textContent = '5';
+  loadDiario();
+};
+
+window.deleteDiario = async (id) => {
+  if (!confirm('¿Eliminar esta entrada?')) return;
+  await deleteDoc(doc(db,'diario',id));
+  loadDiario();
+};
+
 
 </script>
 </body>
